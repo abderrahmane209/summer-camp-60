@@ -132,6 +132,7 @@
                 <button onclick="exportData()">تصدير البيانات 💾</button>
                 <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importData(event)">
                 <button onclick="document.getElementById('import-file').click()">استيراد 📂</button>
+                <button onclick="resetXP()" style="border-color: var(--neon-red); color: var(--neon-red);">تصفير الـ XP 🧹</button>
             </div>
         </header>
 
@@ -265,6 +266,14 @@
             localStorage.setItem('cyberCampData_v2', JSON.stringify(db));
             renderAll();
         }
+        function resetXP() {
+            if(confirm("هل أنت متأكد أنك تريد تصفير نقاط الـ XP والمستوى والبدء من الصفر؟")) {
+                db.stats.xp = 0;
+                db.stats.level = 1;
+                saveData();
+                alert("تم تصفير عداد الـ XP بنجاح! ⚡");
+    }
+}
 
         /* =========================================
            3. التصدير والاستيراد (Export / Import JSON)
