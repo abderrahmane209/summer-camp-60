@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberCamp OS - 60 Days</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --panel-bg: rgba(15, 23, 42, 0.7);
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-green: #00ff66;
+            --neon-red: #ff003c;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --glass-border: rgba(0, 243, 255, 0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at 50% 0%, #1a0b2e 0%, transparent 50%),
+                              linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* تأثيرات زجاجية (Glassmorphism) */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover { border-color: rgba(0, 243, 255, 0.4); box-shadow: 0 0 20px rgba(0,243,255,0.1); }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* الهيدر وشريط المستوى */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .title-glitch { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; color: var(--neon-cyan); text-transform: uppercase; text-shadow: 0 0 10px rgba(0,243,255,0.5); }
+        
+        .level-sys { background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--neon-purple); display: flex; flex-direction: column; gap: 5px; min-width: 250px; }
+        .xp-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; }
+        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan)); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .top-controls button { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .top-controls button:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
+
+        /* الشبكة الرئيسية */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 25px; margin-bottom: 30px; }
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+        .panel-title { font-size: 1.2rem; color: var(--neon-purple); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(188, 19, 254, 0.3); padding-bottom: 10px; }
+
+        /* مؤقت التركيز (Pomodoro) */
+        .timer-display { font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; text-align: center; color: var(--neon-cyan); text-shadow: 0 0 20px rgba(0,243,255,0.4); margin: 15px 0; }
+        .timer-controls { display: flex; justify-content: center; gap: 10px; }
+        .btn-timer { background: #222; border: 1px solid #444; color: #fff; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
+        .btn-timer.active { border-color: var(--neon-green); color: var(--neon-green); }
+
+        /* إدخالات النصوص والأزرار */
+        input, textarea { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid #333; color: var(--text-main); padding: 10px; border-radius: 8px; font-family: inherit; margin-bottom: 10px; transition: 0.3s; }
+        input:focus, textarea:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,243,255,0.2); }
+        .btn-primary { width: 100%; background: var(--neon-purple); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 5px; }
+        .btn-primary:hover { box-shadow: 0 0 15px var(--neon-purple); transform: translateY(-2px); }
+
+        /* المهام والروابط */
+        .task-list, .links-list { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .task-item { display: flex; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); margin-bottom: 8px; border-radius: 6px; border-right: 3px solid var(--neon-cyan); }
+        .task-item input[type="checkbox"] { width: 18px; height: 18px; margin-left: 10px; accent-color: var(--neon-cyan); cursor: pointer; }
+        .task-item.custom { border-right-color: var(--neon-purple); }
+        
+        .link-item { display: flex; justify-content: space-between; padding: 8px; background: rgba(0,0,0,0.4); margin-bottom: 5px; border-radius: 5px; }
+        .link-item a { color: var(--neon-cyan); text-decoration: none; }
+
+        /* الدائرة المركزية (Progress Ring) */
+        .progress-circle-container { display: flex; justify-content: center; align-items: center; margin: 20px 0; position: relative; }
+        .circular-chart { display: block; margin: 0 auto; max-width: 150px; max-height: 150px; }
+        .circle-bg { fill: none; stroke: #222; stroke-width: 3; }
+        .circle { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; }
+        .circle-cyan { stroke: var(--neon-cyan); }
+        .percentage { fill: var(--text-main); font-family: 'JetBrains Mono'; font-size: 8px; text-anchor: middle; font-weight: bold; }
+        
+        .day-controls { text-align: center; margin-top: 20px; }
+        .btn-finish-day { background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple)); color: #fff; border: none; padding: 15px 30px; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
+        .btn-finish-day:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 243, 255, 0.6); }
+
+        /* الكتب والأرشيف */
+        .book-item { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
+        .book-item progress { width: 100%; height: 6px; border-radius: 3px; accent-color: var(--neon-green); }
+        
+        .history-log { background: rgba(0,0,0,0.6); border-right: 4px solid var(--neon-green); padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
+        .history-header { display: flex; justify-content: space-between; color: var(--neon-green); font-weight: bold; margin-bottom: 10px; }
+        .btn-delete-history { background: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .btn-delete-history:hover { background: var(--neon-red); color: #fff; }
+
+        /* ممر التمرير (Scrollbar) */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="title-glitch">CYBER_CAMP_OS <span style="font-size: 1rem; color: var(--text-dim);">v2.0</span></div>
+            <div class="level-sys">
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                    <span id="rank-title" style="color: var(--neon-cyan); font-weight: bold;">Script Kiddie</span>
+                    <span><span id="xp-current">0</span> XP</span>
+                </div>
+                <div class="xp-bar"><div class="xp-fill" id="xp-bar-fill"></div></div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); text-align: left;">المستوى <span id="level-num">1</span></div>
+            </div>
+            <div class="top-controls">
+                <button onclick="toggleFullScreen()">ملء الشاشة 🔲</button>
+                <button onclick="exportData()">تصدير البيانات 💾</button>
+                <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importData(event)">
+                <button onclick="document.getElementById('import-file').click()">استيراد 📂</button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <div class="column">
+                <div class="glass-panel" style="margin-bottom: 20px;">
+                    <div class="panel-title">مؤقت الاختراق (Focus) ⏱️</div>
+                    <div class="timer-display" id="timer">50:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-timer" onclick="setTimer(50, this)">50 دقيقة</button>
+                        <button class="btn-timer" onclick="setTimer(10, this)">10 دقائق</button>
+                        <button class="btn-timer active" id="timer-toggle" onclick="toggleTimer()" style="border-color: var(--neon-cyan); color: var(--neon-cyan);">▶ بدء</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="margin-bottom: 20px;">
+                    <div class="panel-title">الموارد السريعة 🌐</div>
+                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                        <input type="text" id="link-name" placeholder="اسم المنصة" style="width: 40%;">
+                        <input type="text" id="link-url" placeholder="https://..." style="width: 60%;">
+                    </div>
+                    <button class="btn-primary" onclick="addLink()" style="background: #333; padding: 8px;">إضافة رابط ➕</button>
+                    <div class="links-list" id="links-container" style="margin-top: 15px;"></div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="panel-title">نصيحة النظام 💡</div>
+                    <p id="daily-quote" style="font-size: 0.95rem; line-height: 1.8; color: var(--neon-cyan); font-style: italic;"></p>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="glass-panel" style="text-align: center; margin-bottom: 20px;">
+                    <div class="panel-title" style="justify-content: center;">تحليل مسار العطلة 🎯</div>
+                    <div class="progress-circle-container">
+                        <svg viewBox="0 0 36 36" class="circular-chart">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle circle-cyan" id="progress-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <text x="18" y="20.35" class="percentage" id="days-ratio">0/60</text>
+                        </svg>
+                    </div>
+                    <div style="display: flex; justify-content: space-around; font-weight: bold;">
+                        <span style="color: var(--neon-cyan);">المتبقي: <span id="ui-days-left">60</span></span>
+                        <span style="color: var(--neon-purple);">المنقضي: <span id="ui-days-done">0</span></span>
+                    </div>
+                    <div class="day-controls">
+                        <button class="btn-finish-day" onclick="finishDay()">تهيئة وانقضاء اليوم الحالي ⚡</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="panel-title">المهام والبروتوكولات اليومية ☑️</div>
+                    <div class="task-list" id="tasks-container">
+                        </div>
+                    <div style="display: flex; gap: 5px; margin-top: 15px;">
+                        <input type="text" id="new-task-input" placeholder="إضافة مهمة مخصصة لليوم...">
+                        <button onclick="addCustomTask()" style="background: var(--neon-purple); color: white; border:none; border-radius: 5px; padding: 0 15px; cursor: pointer;">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="glass-panel" style="margin-bottom: 20px;">
+                    <div class="panel-title">مستودع الملاحظات والثغرات 📝</div>
+                    <textarea id="daily-notes" placeholder="اكتب الـ Payloads، الأوامر، أو أي ملاحظات فنية استوقفتك اليوم..." style="height: 150px;"></textarea>
+                    <button class="btn-primary" onclick="saveNotes()">حفظ محلي مؤقت 🔒</button>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="panel-title">مكتبة الـ PDF / الكتب 📚</div>
+                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                        <input type="text" id="book-name" placeholder="اسم الكتاب" style="width: 60%;">
+                        <input type="number" id="book-pages" placeholder="الصفحات" style="width: 40%;">
+                    </div>
+                    <button class="btn-primary" onclick="addBook()" style="background: #333;">تسجيل كتاب جديد</button>
+                    <div class="task-list" id="books-container" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="glass-panel">
+            <div class="panel-title" style="color: var(--neon-green); border-color: rgba(0, 255, 102, 0.3);">سجل النظام (الأيام المؤرشفة) 🗄️</div>
+            <div id="history-container"></div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           1. هيكل البيانات الأساسي (Single Source of Truth)
+           ========================================= */
+        let db = {
+            stats: { totalDays: 60, daysDone: 0, xp: 0, level: 1 },
+            tasks: [
+                { id: 't1', text: 'الكارديو والرياضة (1H)', done: false, isStatic: true },
+                { id: 't2', text: 'مسار الأمن السيبراني والاختراق (4H)', done: false, isStatic: true },
+                { id: 't3', text: 'استراحة ذكية والقراءة (1H)', done: false, isStatic: true },
+                { id: 't4', text: 'برمجة السكربتات بالذكاء الاصطناعي (2H)', done: false, isStatic: true },
+                { id: 't5', text: 'الإنجليزية التفاعلية (1.5H)', done: false, isStatic: true }
+            ],
+            books: [],
+            links: [
+                { id: 'l1', name: 'TryHackMe', url: 'https://tryhackme.com' },
+                { id: 'l2', name: 'HackTheBox', url: 'https://hackthebox.com' }
+            ],
+            history: [],
+            currentNotes: ""
+        };
+
+        const ranks = ["Script Kiddie", "Junior Hacker", "Bug Hunter", "Pentester", "Red Teamer", "Cyber Ninja", "System Architect"];
+        const quotes = [
+            "لا يوجد نظام آمن بنسبة 100%، نقطة الضعف دائمًا هي الإنسان.",
+            "الذكاء الاصطناعي لن يسرق وظيفتك، بل من يستخدم الذكاء الاصطناعي هو من سيفعل.",
+            "الانضباط هو الجسر بين أهدافك وإنجازاتها.",
+            "في الأمن السيبراني: فكر كمهاجم، واعمل كمدافع."
+        ];
+
+        /* =========================================
+           2. التهيئة وإدارة التخزين (Init & Storage)
+           ========================================= */
+        window.onload = () => {
+            const savedData = localStorage.getItem('cyberCampData_v2');
+            if (savedData) { db = JSON.parse(savedData); }
+            
+            document.getElementById('daily-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+            renderAll();
+        };
+
+        function saveData() {
+            localStorage.setItem('cyberCampData_v2', JSON.stringify(db));
+            renderAll();
+        }
+
+        /* =========================================
+           3. التصدير والاستيراد (Export / Import JSON)
+           ========================================= */
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `CyberCamp_Backup_Day${db.stats.daysDone}.json`);
+            dlAnchorElem.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    db = JSON.parse(e.target.result);
+                    saveData();
+                    alert("تم استعادة النظام بنجاح! 🟢");
+                } catch (err) { alert("ملف غير صالح! 🔴"); }
+            };
+            reader.readAsText(file);
+        }
+
+        /* =========================================
+           4. نظام التلعيب والخبرة (Gamification)
+           ========================================= */
+        function addXP(amount) {
+            db.stats.xp += amount;
+            db.stats.level = Math.floor(db.stats.xp / 100) + 1;
+            saveData();
+        }
+
+        /* =========================================
+           5. عرض واجهة المستخدم (Rendering Engine)
+           ========================================= */
+        function renderAll() {
+            // Stats & Level
+            let left = db.stats.totalDays - db.stats.daysDone;
+            document.getElementById('ui-days-left').innerText = left;
+            document.getElementById('ui-days-done').innerText = db.stats.daysDone;
+            
+            document.getElementById('xp-current').innerText = db.stats.xp;
+            document.getElementById('level-num').innerText = db.stats.level;
+            
+            let rankIndex = Math.min(db.stats.level - 1, ranks.length - 1);
+            document.getElementById('rank-title').innerText = ranks[rankIndex];
+            
+            let xpPercent = (db.stats.xp % 100) + "%";
+            document.getElementById('xp-bar-fill').style.width = xpPercent;
+
+            // Progress Ring
+            let ratio = (db.stats.daysDone / db.stats.totalDays) * 100;
+            document.getElementById('progress-circle').setAttribute('stroke-dasharray', `${ratio}, 100`);
+            document.getElementById('days-ratio').innerText = `${db.stats.daysDone}/${db.stats.totalDays}`;
+
+            // Notes
+            document.getElementById('daily-notes').value = db.currentNotes;
+
+            renderTasks();
+            renderBooks();
+            renderLinks();
+            renderHistory();
+        }
+
+        /* =========================================
+           6. إدارة المهام (Tasks)
+           ========================================= */
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+            db.tasks.forEach((t, i) => {
+                container.innerHTML += `
+                    <div class="task-item ${t.isStatic ? '' : 'custom'}">
+                        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${i}, this.checked)">
+                        <span style="flex-grow: 1; margin-right: 10px; ${t.done ? 'text-decoration:line-through; color:var(--text-dim)' : ''}">${t.text}</span>
+                        ${!t.isStatic ? `<button onclick="deleteTask(${i})" style="background:transparent; border:none; color:var(--neon-red); cursor:pointer;">❌</button>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function toggleTask(index, isDone) {
+            db.tasks[index].done = isDone;
+            if (isDone) addXP(10); // 10 XP لكل مهمة منجزة
+            saveData();
+        }
+
+        function addCustomTask() {
+            const val = document.getElementById('new-task-input').value.trim();
+            if(val) {
+                db.tasks.push({ id: Date.now(), text: val, done: false, isStatic: false });
+                document.getElementById('new-task-input').value = '';
+                saveData();
+            }
+        }
+
+        function deleteTask(index) {
+            db.tasks.splice(index, 1);
+            saveData();
+        }
+
+        /* =========================================
+           7. إدارة الكتب (Books)
+           ========================================= */
+        function renderBooks() {
+            const container = document.getElementById('books-container');
+            container.innerHTML = '';
+            db.books.forEach((b, i) => {
+                let percent = Math.round((b.read / b.total) * 100);
+                container.innerHTML += `
+                    <div class="book-item">
+                        <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:5px;">
+                            <strong style="color:var(--neon-cyan)">${b.name}</strong>
+                            <span>${b.read} / ${b.total} (${percent}%)</span>
+                        </div>
+                        <progress value="${b.read}" max="${b.total}"></progress>
+                        <div style="display:flex; gap:5px; margin-top:8px;">
+                            <input type="number" id="bk-val-${i}" value="${b.read}" min="0" max="${b.total}" style="margin:0; padding:3px; text-align:center;">
+                            <button onclick="updateBook(${i})" style="background:#222; color:#fff; border:1px solid #444; border-radius:4px; padding:0 10px; cursor:pointer;">تحديث</button>
+                            <button onclick="deleteBook(${i})" style="background:transparent; color:var(--neon-red); border:none; cursor:pointer;">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addBook() {
+            let name = document.getElementById('book-name').value.trim();
+            let pages = parseInt(document.getElementById('book-pages').value);
+            if(name && pages > 0) {
+                db.books.push({ name: name, total: pages, read: 0 });
+                document.getElementById('book-name').value = '';
+                document.getElementById('book-pages').value = '';
+                saveData();
+            }
+        }
+
+        function updateBook(index) {
+            let newVal = parseInt(document.getElementById(`bk-val-${index}`).value);
+            if(newVal >= 0 && newVal <= db.books[index].total) {
+                let diff = newVal - db.books[index].read;
+                if(diff > 0) addXP(diff); // 1 XP لكل صفحة مقروءة
+                db.books[index].read = newVal;
+                saveData();
+            }
+        }
+
+        function deleteBook(index) {
+            db.books.splice(index, 1);
+            saveData();
+        }
+
+        /* =========================================
+           8. الروابط السريعة (Links)
+           ========================================= */
+        function renderLinks() {
+            const container = document.getElementById('links-container');
+            container.innerHTML = '';
+            db.links.forEach((l, i) => {
+                container.innerHTML += `
+                    <div class="link-item">
+                        <a href="${l.url}" target="_blank">🔗 ${l.name}</a>
+                        <button onclick="deleteLink(${i})" style="background:transparent; border:none; color:var(--text-dim); cursor:pointer;">✖</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addLink() {
+            let name = document.getElementById('link-name').value.trim();
+            let url = document.getElementById('link-url').value.trim();
+            if(name && url) {
+                if(!url.startsWith('http')) url = 'https://' + url;
+                db.links.push({ name: name, url: url });
+                document.getElementById('link-name').value = '';
+                document.getElementById('link-url').value = '';
+                saveData();
+            }
+        }
+        function deleteLink(index) { db.links.splice(index, 1); saveData(); }
+
+        /* =========================================
+           9. الأرشفة وانقضاء اليوم (History System)
+           ========================================= */
+        function saveNotes() {
+            db.currentNotes = document.getElementById('daily-notes').value;
+            saveData();
+            alert("تم الحفظ 🔒");
+        }
+
+        function finishDay() {
+            if(db.stats.daysDone >= db.stats.totalDays) {
+                alert("لقد أتممت العطلة بالكامل! 🏆"); return;
+            }
+            if(!confirm("هل أنت متأكد من إنهاء اليوم وأرشفته؟")) return;
+
+            // جمع بيانات اليوم
+            saveNotes();
+            let dayRecord = {
+                dayNum: db.stats.daysDone + 1,
+                date: new Date().toLocaleDateString('ar-EG'),
+                notes: db.currentNotes,
+                tasksLog: db.tasks.map(t => ({ text: t.text, status: t.done ? '✓' : '✗' }))
+            };
+
+            // تحديث الإحصائيات
+            db.history.unshift(dayRecord);
+            db.stats.daysDone++;
+            addXP(50); // مكافأة إنهاء اليوم
+            
+            // تصفير يوم غد
+            db.currentNotes = "";
+            db.tasks.forEach(t => t.done = false);
+
+            saveData();
+            alert(`تم تهيئة النظام لليوم ${db.stats.daysDone + 1} 🚀`);
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '';
+            if(db.history.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-dim); text-align:center;">سجل النظام فارغ.</p>';
+                return;
+            }
+
+            db.history.forEach((h, i) => {
+                let tasksHTML = '<ul style="margin-right:20px; font-size:0.9rem; color:var(--text-dim); margin-bottom:10px;">';
+                h.tasksLog.forEach(t => {
+                    let color = t.status === '✓' ? 'var(--neon-green)' : 'var(--neon-red)';
+                    tasksHTML += `<li>${t.text}: <span style="color:${color}">${t.status}</span></li>`;
+                });
+                tasksHTML += '</ul>';
+
+                container.innerHTML += `
+                    <div class="history-log">
+                        <div class="history-header">
+                            <span>اليوم ${h.dayNum} - [${h.date}]</span>
+                            <button class="btn-delete-history" onclick="deleteHistory(${i})">حذف السجل 🗑️</button>
+                        </div>
+                        ${tasksHTML}
+                        <div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:5px; white-space:pre-wrap; border:1px solid #333; font-size:0.9rem;">${h.notes || "لا توجد ملاحظات مسجلة."}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteHistory(index) {
+            if(!confirm("حذف هذا اليوم سيعيده للوراء وينقص الـ XP. متأكد؟")) return;
+            
+            db.stats.daysDone--;
+            db.stats.xp = Math.max(0, db.stats.xp - 50); // خصم نقاط اليوم المحذوف
+            db.history.splice(index, 1);
+            saveData();
+        }
+
+        /* =========================================
+           10. مؤقت التركيز (Pomodoro) وملء الشاشة
+           ========================================= */
+        let timerInterval;
+        let timeRemaining = 50 * 60; // ثواني
+        let isRunning = false;
+
+        function setTimer(minutes, btn) {
+            clearInterval(timerInterval);
+            timeRemaining = minutes * 60;
+            isRunning = false;
+            document.getElementById('timer-toggle').innerText = "▶ بدء";
+            updateTimerDisplay();
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timer-toggle');
+            if(isRunning) {
+                clearInterval(timerInterval);
+                btn.innerText = "▶ استئناف";
+                isRunning = false;
+            } else {
+                timerInterval = setInterval(() => {
+                    if(timeRemaining > 0) { timeRemaining--; updateTimerDisplay(); }
+                    else { clearInterval(timerInterval); alert("انتهى الوقت! 🔔"); isRunning = false; }
+                }, 1000);
+                btn.innerText = "⏸ إيقاف";
+                isRunning = true;
+            }
+        }
+
+        function updateTimerDisplay() {
+            let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            let s = (timeRemaining % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+            else { if (document.exitFullscreen) { document.exitFullscreen(); } }
+        }
+    </script>
+</body>
+</html>
