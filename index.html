@@ -3,136 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberCamp OS - 60 Days</title>
+    <title>CyberCamp OS - ELITE v3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-deep: #050505;
-            --panel-bg: rgba(15, 23, 42, 0.7);
+            --panel-bg: rgba(15, 23, 42, 0.75);
             --neon-cyan: #00f3ff;
             --neon-purple: #bc13fe;
             --neon-green: #00ff66;
             --neon-red: #ff003c;
+            --neon-orange: #ff9900;
             --text-main: #e2e8f0;
             --text-dim: #94a3b8;
             --glass-border: rgba(0, 243, 255, 0.2);
+        }
+
+        /* قوالب الأنماط (Themes) */
+        body.matrix-theme {
+            --bg-deep: #000000;
+            --panel-bg: rgba(0, 15, 5, 0.85);
+            --neon-cyan: #00ff66;
+            --neon-purple: #008822;
+            --neon-green: #00ff33;
+            --glass-border: rgba(0, 255, 50, 0.2);
+        }
+        body.redteam-theme {
+            --bg-deep: #0a0202;
+            --panel-bg: rgba(20, 5, 5, 0.85);
+            --neon-cyan: #ff003c;
+            --neon-purple: #880011;
+            --neon-green: #ff3300;
+            --glass-border: rgba(255, 0, 50, 0.2);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
             background-color: var(--bg-deep);
-            background-image: radial-gradient(circle at 50% 0%, #1a0b2e 0%, transparent 50%),
-                              linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
+            background-image: radial-gradient(circle at 50% 0%, rgba(188,19,254,0.15) 0%, transparent 50%),
+                              linear-gradient(0deg, rgba(0,243,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,243,255,0.02) 1px, transparent 1px);
             background-size: 100% 100%, 30px 30px, 30px 30px;
             color: var(--text-main);
             font-family: 'Cairo', sans-serif;
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
         }
 
-        /* تأثيرات زجاجية (Glassmorphism) */
+        .container { max-width: 1600px; margin: 0 auto; }
         .glass-panel {
             background: var(--panel-bg);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
             transition: all 0.3s ease;
         }
-        .glass-panel:hover { border-color: rgba(0, 243, 255, 0.4); box-shadow: 0 0 20px rgba(0,243,255,0.1); }
+        .glass-panel:hover { border-color: var(--neon-cyan); }
 
-        .container { max-width: 1400px; margin: 0 auto; }
-
-        /* الهيدر وشريط المستوى */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
-        .title-glitch { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; color: var(--neon-cyan); text-transform: uppercase; text-shadow: 0 0 10px rgba(0,243,255,0.5); }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 20px; }
+        .title-glitch { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,243,255,0.4); }
         
-        .level-sys { background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--neon-purple); display: flex; flex-direction: column; gap: 5px; min-width: 250px; }
-        .xp-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; }
-        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan)); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .level-sys { background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--neon-purple); min-width: 280px; }
+        .xp-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan)); width: 0%; transition: width 0.4s ease; }
 
-        .top-controls button { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; }
-        .top-controls button:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
+        button, .btn { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 600; transition: 0.2s; }
+        button:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 12px var(--neon-cyan); }
+        .btn-purple { border-color: var(--neon-purple); color: var(--neon-purple); }
+        .btn-purple:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 12px var(--neon-purple); }
 
-        /* الشبكة الرئيسية */
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 25px; margin-bottom: 30px; }
-        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } }
+        /* التقسيم الرئيسي للوحة التحكم */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; margin-bottom: 25px; }
+        @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
-        .panel-title { font-size: 1.2rem; color: var(--neon-purple); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(188, 19, 254, 0.3); padding-bottom: 10px; }
+        .panel-title { font-size: 1.15rem; color: var(--neon-purple); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(188, 19, 254, 0.2); padding-bottom: 8px; font-weight: 800; }
 
-        /* مؤقت التركيز (Pomodoro) */
-        .timer-display { font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; text-align: center; color: var(--neon-cyan); text-shadow: 0 0 20px rgba(0,243,255,0.4); margin: 15px 0; }
-        .timer-controls { display: flex; justify-content: center; gap: 10px; }
-        .btn-timer { background: #222; border: 1px solid #444; color: #fff; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
-        .btn-timer.active { border-color: var(--neon-green); color: var(--neon-green); }
+        /* المحطة الطرفية الـ Terminal */
+        .terminal-box { background: #000; border: 1px solid #222; border-radius: 8px; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+        .terminal-outputs { height: 140px; overflow-y: auto; color: var(--neon-green); text-align: left; direction: ltr; margin-bottom: 8px; }
+        .terminal-row { display: flex; gap: 5px; align-items: center; }
+        .terminal-input { background: transparent; border: none; color: #fff; font-family: inherit; width: 100%; padding: 0; margin: 0; outline: none; }
 
-        /* إدخالات النصوص والأزرار */
-        input, textarea { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid #333; color: var(--text-main); padding: 10px; border-radius: 8px; font-family: inherit; margin-bottom: 10px; transition: 0.3s; }
-        input:focus, textarea:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,243,255,0.2); }
-        .btn-primary { width: 100%; background: var(--neon-purple); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 5px; }
-        .btn-primary:hover { box-shadow: 0 0 15px var(--neon-purple); transform: translateY(-2px); }
+        /* النوافذ المنبثقة (Modals) */
+        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; justify-content:center; align-items:center; }
+        .modal-content { background: #0d1117; border: 2px solid var(--neon-cyan); border-radius: 12px; width: 90%; max-width: 650px; padding: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 0 30px rgba(0,243,255,0.2); }
 
-        /* المهام والروابط */
-        .task-list, .links-list { max-height: 250px; overflow-y: auto; padding-right: 5px; }
-        .task-item { display: flex; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); margin-bottom: 8px; border-radius: 6px; border-right: 3px solid var(--neon-cyan); }
-        .task-item input[type="checkbox"] { width: 18px; height: 18px; margin-left: 10px; accent-color: var(--neon-cyan); cursor: pointer; }
+        /* إدخالات وقوائم */
+        input[type="text"], input[type="number"], textarea, select { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #333; color: var(--text-main); padding: 8px 12px; border-radius: 6px; font-family: inherit; margin-bottom: 8px; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--neon-cyan); }
+        
+        .item-list { max-height: 220px; overflow-y: auto; }
+        .task-item { display: flex; align-items: center; padding: 10px; background: rgba(255,255,255,0.02); margin-bottom: 6px; border-radius: 6px; border-right: 3px solid var(--neon-cyan); }
         .task-item.custom { border-right-color: var(--neon-purple); }
-        
-        .link-item { display: flex; justify-content: space-between; padding: 8px; background: rgba(0,0,0,0.4); margin-bottom: 5px; border-radius: 5px; }
-        .link-item a { color: var(--neon-cyan); text-decoration: none; }
+        .task-item input[type="checkbox"] { width: 16px; height: 16px; margin-left: 10px; accent-color: var(--neon-cyan); cursor: pointer; }
 
-        /* الدائرة المركزية (Progress Ring) */
-        .progress-circle-container { display: flex; justify-content: center; align-items: center; margin: 20px 0; position: relative; }
-        .circular-chart { display: block; margin: 0 auto; max-width: 150px; max-height: 150px; }
+        .sprint-item { background: rgba(0, 0, 0, 0.4); border: 1px solid #222; border-right: 4px solid var(--neon-orange); padding: 10px; border-radius: 8px; margin-bottom: 8px; }
+        .vault-item { background: #111; border: 1px solid #222; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; text-align: left; direction: ltr; }
+
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .badge-card { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 8px; width: calc(33.33% - 7px); text-align: center; opacity: 0.4; transition: 0.3s; }
+        .badge-card.unlocked { opacity: 1; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,102,0.1); }
+
+        /* شاشة القفل التلقائية */
+        #lock-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#050505; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+        
+        .timer-display { font-family: 'JetBrains Mono', monospace; font-size: 3rem; text-align: center; color: var(--neon-cyan); margin: 10px 0; }
+        .progress-circle-container { display: flex; justify-content: center; align-items: center; margin: 15px 0; }
+        .circular-chart { max-width: 120px; }
         .circle-bg { fill: none; stroke: #222; stroke-width: 3; }
-        .circle { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; }
-        .circle-cyan { stroke: var(--neon-cyan); }
+        .circle { fill: none; stroke-width: 3; stroke-linecap: round; stroke: var(--neon-cyan); }
         .percentage { fill: var(--text-main); font-family: 'JetBrains Mono'; font-size: 8px; text-anchor: middle; font-weight: bold; }
-        
-        .day-controls { text-align: center; margin-top: 20px; }
-        .btn-finish-day { background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple)); color: #fff; border: none; padding: 15px 30px; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
-        .btn-finish-day:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 243, 255, 0.6); }
-
-        /* الكتب والأرشيف */
-        .book-item { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
-        .book-item progress { width: 100%; height: 6px; border-radius: 3px; accent-color: var(--neon-green); }
-        
-        .history-log { background: rgba(0,0,0,0.6); border-right: 4px solid var(--neon-green); padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
-        .history-header { display: flex; justify-content: space-between; color: var(--neon-green); font-weight: bold; margin-bottom: 10px; }
-        .btn-delete-history { background: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
-        .btn-delete-history:hover { background: var(--neon-red); color: #fff; }
-
-        /* ممر التمرير (Scrollbar) */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-deep); }
-        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 4px; }
     </style>
 </head>
-<body>
+<body class="">
+
+    <div id="lock-screen">
+        <div class="glass-panel" style="width: 320px; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">🔒</div>
+            <h3 style="margin-bottom: 15px; color: var(--neon-cyan)">CYBER_CAMP_OS LOCK</h3>
+            <input type="password" id="pin-input" placeholder="أدخل رمز الـ PIN الافتراضي (1234)" style="text-align: center; letter-spacing: 5px;">
+            <button onclick="unlockSystem()" style="width: 100%; margin-top: 5px;">إلغاء القفل</button>
+        </div>
+    </div>
 
     <div class="container">
         <header>
-            <div class="title-glitch">CYBER_CAMP_OS <span style="font-size: 1rem; color: var(--text-dim);">v2.0</span></div>
+            <div class="title-glitch">CYBER_CAMP_OS <span style="font-size: 0.9rem; color: var(--text-dim);">[ELITE v3.0]</span></div>
             <div class="level-sys">
-                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                     <span id="rank-title" style="color: var(--neon-cyan); font-weight: bold;">Script Kiddie</span>
                     <span><span id="xp-current">0</span> XP</span>
                 </div>
                 <div class="xp-bar"><div class="xp-fill" id="xp-bar-fill"></div></div>
-                <div style="font-size: 0.75rem; color: var(--text-dim); text-align: left;">المستوى <span id="level-num">1</span></div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 3px;">المستوى <span id="level-num">1</span></div>
             </div>
-            <div class="top-controls">
-                <button onclick="toggleFullScreen()">ملء الشاشة 🔲</button>
-                <button onclick="exportData()">تصدير البيانات 💾</button>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="openModal('help-modal')">ℹ️ حول والكتالوج</button>
+                <button onclick="openModal('analytics-modal'); renderCharts();">📊 الإحصائيات</button>
+                <button onclick="openModal('badges-modal')">🏆 الأوسمة</button>
+                <button onclick="toggleTheme切换()">🎨 الأنماط</button>
+                <button onclick="exportData()" title="نسخة احتياطية">💾</button>
+                <button onclick="document.getElementById('import-file').click()" title="استيراد">📂</button>
                 <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importData(event)">
-                <button onclick="document.getElementById('import-file').click()">استيراد 📂</button>
-                <button onclick="resetXP()" style="border-color: var(--neon-red); color: var(--neon-red);">تصفير الـ XP 🧹</button>
+                <button onclick="resetXP()" style="border-color: var(--neon-red); color: var(--neon-red);" title="تصفير الـ XP">🧹</button>
             </div>
         </header>
 
@@ -140,150 +158,592 @@
             
             <div class="column">
                 <div class="glass-panel" style="margin-bottom: 20px;">
-                    <div class="panel-title">مؤقت الاختراق (Focus) ⏱️</div>
-                    <div class="timer-display" id="timer">50:00</div>
-                    <div class="timer-controls">
-                        <button class="btn-timer" onclick="setTimer(50, this)">50 دقيقة</button>
-                        <button class="btn-timer" onclick="setTimer(10, this)">10 دقائق</button>
-                        <button class="btn-timer active" id="timer-toggle" onclick="toggleTimer()" style="border-color: var(--neon-cyan); color: var(--neon-cyan);">▶ بدء</button>
+                    <div class="panel-title">الطرفية الذكية Terminal (اضغط Esc للتركيز)</div>
+                    <div class="terminal-box">
+                        <div class="terminal-outputs" id="term-out"></div>
+                        <div class="terminal-row">
+                            <span style="color: var(--neon-cyan)">$</span>
+                            <input type="text" id="term-cmd" class="terminal-input" placeholder="اكتب help لعرض الأوامر...">
+                        </div>
                     </div>
-                </div>
-
-                <div class="glass-panel" style="margin-bottom: 20px;">
-                    <div class="panel-title">الموارد السريعة 🌐</div>
-                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                        <input type="text" id="link-name" placeholder="اسم المنصة" style="width: 40%;">
-                        <input type="text" id="link-url" placeholder="https://..." style="width: 60%;">
-                    </div>
-                    <button class="btn-primary" onclick="addLink()" style="background: #333; padding: 8px;">إضافة رابط ➕</button>
-                    <div class="links-list" id="links-container" style="margin-top: 15px;"></div>
                 </div>
 
                 <div class="glass-panel">
-                    <div class="panel-title">نصيحة النظام 💡</div>
-                    <p id="daily-quote" style="font-size: 0.95rem; line-height: 1.8; color: var(--neon-cyan); font-style: italic;"></p>
+                    <div class="panel-title">المشاريع والمواد الدراسية (1bac / 2bac)</div>
+                    <div class="item-list" id="sprints-container" style="max-height: 320px;"></div>
                 </div>
             </div>
 
             <div class="column">
                 <div class="glass-panel" style="text-align: center; margin-bottom: 20px;">
-                    <div class="panel-title" style="justify-content: center;">تحليل مسار العطلة 🎯</div>
+                    <div class="panel-title" style="justify-content: center;">تحليل مسار العطلة الصيفية</div>
                     <div class="progress-circle-container">
                         <svg viewBox="0 0 36 36" class="circular-chart">
                             <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="circle circle-cyan" id="progress-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle" id="progress-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <text x="18" y="20.35" class="percentage" id="days-ratio">0/60</text>
                         </svg>
                     </div>
-                    <div style="display: flex; justify-content: space-around; font-weight: bold;">
-                        <span style="color: var(--neon-cyan);">المتبقي: <span id="ui-days-left">60</span></span>
-                        <span style="color: var(--neon-purple);">المنقضي: <span id="ui-days-done">0</span></span>
+                    <div style="display: flex; justify-content: space-around; font-size: 0.9rem;">
+                        <span style="color: var(--neon-cyan);">المتبقي: <span id="ui-days-left">60</span> يوم</span>
+                        <span style="color: var(--neon-purple);">المنقضي: <span id="ui-days-done">0</span> يوم</span>
                     </div>
-                    <div class="day-controls">
-                        <button class="btn-finish-day" onclick="finishDay()">تهيئة وانقضاء اليوم الحالي ⚡</button>
-                    </div>
+                    <button onclick="finishDay()" class="btn-purple" style="width: 100%; margin-top: 15px; padding: 12px;">انقضاء وأرشفة اليوم الحالي ⚡</button>
                 </div>
 
                 <div class="glass-panel">
-                    <div class="panel-title">المهام والبروتوكولات اليومية ☑️</div>
-                    <div class="task-list" id="tasks-container">
-                        </div>
-                    <div style="display: flex; gap: 5px; margin-top: 15px;">
-                        <input type="text" id="new-task-input" placeholder="إضافة مهمة مخصصة لليوم...">
-                        <button onclick="addCustomTask()" style="background: var(--neon-purple); color: white; border:none; border-radius: 5px; padding: 0 15px; cursor: pointer;">+</button>
+                    <div class="panel-title">المهام والبروتوكولات اليومية</div>
+                    <div class="item-list" id="tasks-container"></div>
+                    <div style="display: flex; gap: 5px; margin-top: 10px;">
+                        <input type="text" id="new-task-input" placeholder="إضافة مهمة مخصصة..." style="margin-bottom:0;">
+                        <button onclick="addCustomTask()">+</button>
                     </div>
                 </div>
             </div>
 
             <div class="column">
                 <div class="glass-panel" style="margin-bottom: 20px;">
-                    <div class="panel-title">مستودع الملاحظات والثغرات 📝</div>
-                    <textarea id="daily-notes" placeholder="اكتب الـ Payloads، الأوامر، أو أي ملاحظات فنية استوقفتك اليوم..." style="height: 150px;"></textarea>
-                    <button class="btn-primary" onclick="saveNotes()">حفظ محلي مؤقت 🔒</button>
+                    <div class="panel-title">أدوات التشفير المصغرة Base64 Tool</div>
+                    <input type="text" id="crypto-input" placeholder="أدخل النص للتشفير/الفك..." style="font-size:0.85rem;">
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="runCrypto('encode')" style="flex:1; padding:5px;">تشفير Base64</button>
+                        <button onclick="runCrypto('decode')" style="flex:1; padding:5px;">فك تشفير</button>
+                    </div>
+                    <div id="crypto-output" style="margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; font-family: monospace; font-size:0.85rem; word-break: break-all; color: var(--neon-green);">النتيجة ستظهر هنا...</div>
+                </div>
+
+                <div class="glass-panel" style="margin-bottom: 20px;">
+                    <div class="panel-title">مؤقت التركيز الفائق (Focus)</div>
+                    <div class="timer-display" id="timer">50:00</div>
+                    <div style="display: flex; justify-content: center; gap: 8px;">
+                        <button onclick="setTimer(50)">50 د</button>
+                        <button onclick="setTimer(10)">10 د</button>
+                        <button id="timer-toggle" onclick="toggleTimer()">▶ بدء</button>
+                    </div>
                 </div>
 
                 <div class="glass-panel">
-                    <div class="panel-title">مكتبة الـ PDF / الكتب 📚</div>
-                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                        <input type="text" id="book-name" placeholder="اسم الكتاب" style="width: 60%;">
-                        <input type="number" id="book-pages" placeholder="الصفحات" style="width: 40%;">
-                    </div>
-                    <button class="btn-primary" onclick="addBook()" style="background: #333;">تسجيل كتاب جديد</button>
-                    <div class="task-list" id="books-container" style="margin-top: 15px;"></div>
+                    <div class="panel-title">مستودع الملاحظات والحفظ المؤقت</div>
+                    <textarea id="daily-notes" placeholder="اكتب الملاحظات، الـ Payloads، أو ملخصاتك هنا..." style="height: 100px; margin-bottom: 5px;"></textarea>
+                    <button onclick="saveNotes()" style="width: 100%; padding: 6px; font-size: 0.85rem;">حفظ محلي آمن 🔒</button>
                 </div>
             </div>
-
         </div>
 
-        <div class="glass-panel">
-            <div class="panel-title" style="color: var(--neon-green); border-color: rgba(0, 255, 102, 0.3);">سجل النظام (الأيام المؤرشفة) 🗄️</div>
-            <div id="history-container"></div>
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
+            <div class="glass-panel">
+                <div class="panel-title">مكتبة الـ PDF / الكتب 📚</div>
+                <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+                    <input type="text" id="book-name" placeholder="اسم الكتاب" style="width:65%; margin:0;">
+                    <input type="number" id="book-pages" placeholder="الصفحات" style="width:35%; margin:0;">
+                    <button onclick="addBook()">+</button>
+                </div>
+                <div class="item-list" id="books-container" style="max-height: 250px;"></div>
+            </div>
+
+            <div class="glass-panel">
+                <div class="panel-title" style="color: var(--neon-green)">سجل الأيام المؤرشفة والمقيدة نظامياً 🗄️</div>
+                <div id="history-container" class="item-list" style="max-height: 290px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-modal" class="modal-overlay" onclick="closeModalOnOuter(event)">
+        <div class="modal-content">
+            <h2 style="color: var(--neon-cyan); margin-bottom: 15px;">كتالوج موجه الأوامر والأدلة المرجعية</h2>
+            <p style="margin-bottom: 15px; font-size: 0.95rem; line-height: 1.6;">يمكنك استخدام الطرفية للتحكم بالموقع كالمحترفين، الأوامر المدعومة هي:</p>
+            <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 0.9rem; margin-bottom: 20px; text-align: right;">
+                <tr style="border-bottom: 1px solid #333; color: var(--neon-purple);"><th style="padding:8px;">الأمر</th><th style="padding:8px;">الوظيفة الإجرائية</th></tr>
+                <tr><td style="padding:8px; color:var(--neon-green)">help</td><td style="padding:8px;">عرض هذا الدليل الإرشادي المساعد.</td></tr>
+                <tr><td style="padding:8px; color:var(--neon-green)">add "اسم المهمة"</td><td style="padding:8px;">إنشاء وإدراج مهمة مخصصة جديدة لليوم الحالي.</td></tr>
+                <tr><td style="padding:8px; color:var(--neon-green)">timer [دقائق]</td><td style="padding:8px;">ضبط عداد الوقت البومودورو فوراً (مثال: timer 25).</td></tr>
+                <tr><td style="padding:8px; color:var(--neon-green)">cls / clear</td><td style="padding:8px;">تطهير ومسح شاشة مخرجات الطرفية الحالية.</td></tr>
+                <tr><td style="padding:8px; color:var(--neon-green)">theme [matrix/red/default]</td><td style="padding:8px;">التحول وتغيير نمط وألوان الواجهة الرسومية مباشرة.</td></tr>
+            </table>
+            <button onclick="closeModal('help-modal')" style="width: 100%;">إغلاق النافذة</button>
+        </div>
+    </div>
+
+    <div id="badges-modal" class="modal-overlay" onclick="closeModalOnOuter(event)">
+        <div class="modal-content" style="max-width: 750px;">
+            <h2 style="color: var(--neon-purple); margin-bottom: 15px;">نظام الأوسمة والاستحقاق التقني</h2>
+            <div class="badge-grid" id="badges-container">
+                <div class="badge-card" id="badge-1">🏆<br><strong>First Blood</strong><br><span style="font-size:0.75rem; color:var(--text-dim);">أرشفة أول يوم في المعسكر الصيفي</span></div>
+                <div class="badge-card" id="badge-2">🔥<br><strong>Elite Hacker</strong><br><span style="font-size:0.75rem; color:var(--text-dim);">بلوغ المستوى البرمجي 3 فما فوق</span></div>
+                <div class="badge-card" id="badge-3">📚<br><strong>Book Worm</strong><br><span style="font-size:0.75rem; color:var(--text-dim);">قراءة وإتمام أول كتاب PDF بالكامل</span></div>
+                <div class="badge-card" id="badge-4">🎓<br><strong>Bac Master</strong><br><span style="font-size:0.75rem; color:var(--text-dim);">مراجعة وإنهاء أول 5 أيام من مواد الباك</span></div>
+                <div class="badge-card" id="badge-5">⚡<br><strong>Terminal God</strong><br><span style="font-size:0.75rem; color:var(--text-dim);">تنفيذ 5 أوامر برمجية عبر الطرفية</span></div>
+                <div class="badge-card" id="badge-6">👑<br><strong>The Architect</strong><br><span style="font-size:0.75rem; color:var(--text-dim);">إتمام نصف مدة الخطة الصيفية (30 يوم)</span></div>
+            </div>
+            <button onclick="closeModal('badges-modal')" style="width: 100%; margin-top: 20px;">إغلاق النافذة</button>
+        </div>
+    </div>
+
+<div id="analytics-modal" class="modal-overlay" onclick="closeModalOnOuter(event)">
+        <div class="modal-content" style="max-width: 850px; width: 95%;">
+            <h2 style="color: var(--neon-cyan); margin-bottom: 15px; text-align: center;">لوحة التحليل الإحصائي المنطقي</h2>
+            
+            <h3 style="color: #fff; font-size: 1rem; margin-bottom: 8px;">1. منحنى تقدم الأيام واكتساب الـ XP عبر الزمن 📈</h3>
+            <div style="background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px; margin-bottom: 20px; height: 220px;">
+                <canvas id="timeChart"></canvas>
+            </div>
+            
+            <h3 style="color: #fff; font-size: 1rem; margin-bottom: 8px;">2. معدل إنجاز وتجهيز مواد الباكالوريا (بالأيام) 📊</h3>
+            <div style="background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px; margin-bottom: 15px; height: 220px;">
+                <canvas id="sprintsChart"></canvas>
+            </div>
+
+            <button onclick="closeModal('analytics-modal')" style="width: 100%; margin-top: 5px;">إغلاق لوحة التحكم</button>
         </div>
     </div>
 
     <script>
-        /* =========================================
-           1. هيكل البيانات الأساسي (Single Source of Truth)
-           ========================================= */
+        // هيكل البيانات الشامل
         let db = {
-            stats: { totalDays: 60, daysDone: 0, xp: 0, level: 1 },
+            stats: { totalDays: 60, daysDone: 0, xp: 0, level: 1, currentTheme: 'default', terminalCmdsExecuted: 0 },
             tasks: [
-                { id: 't1', text: 'الكارديو والرياضة (1H)', done: false, isStatic: true },
-                { id: 't2', text: 'مسار الأمن السيبراني والاختراق (4H)', done: false, isStatic: true },
-                { id: 't3', text: 'استراحة ذكية والقراءة (1H)', done: false, isStatic: true },
-                { id: 't4', text: 'برمجة السكربتات بالذكاء الاصطناعي (2H)', done: false, isStatic: true },
-                { id: 't5', text: 'الإنجليزية التفاعلية (1.5H)', done: false, isStatic: true }
+                { id: 't1', text: 'الرياضة والنشاط البدني الصباحي (1H)', done: false, isStatic: true },
+                { id: 't2', text: 'بروتوكول وبحوث الأمن السيبراني والاختراق (4H)', done: false, isStatic: true },
+                { id: 't3', text: 'الاستراحة الذكية ومطالعة الكتب والـ PDF (1H)', done: false, isStatic: true },
+                { id: 't4', text: 'تطوير البرمجيات والسكربتات بالذكاء الاصطناعي (2H)', done: false, isStatic: true },
+                { id: 't5', text: 'تعلم ودراسة اللغة الإنجليزية التفاعلية (1.5H)', done: false, isStatic: true }
             ],
             books: [],
-            links: [
-                { id: 'l1', name: 'TryHackMe', url: 'https://tryhackme.com' },
-                { id: 'l2', name: 'HackTheBox', url: 'https://hackthebox.com' }
+            sprints: [
+                { name: 'مراجعة وتثبيت دروس 1bac', daysTotal: 20, daysLeft: 20, type: '1bac' },
+                { name: 'اطلاع وتجهيز: الفيزياء 2bac', daysTotal: 15, daysLeft: 15, type: '2bac' },
+                { name: 'اطلاع وتجهيز: الرياضيات 2bac', daysTotal: 15, daysLeft: 15, type: '2bac' },
+                { name: 'اطلاع وتجهيز: العلوم الطبيعية 2bac', daysTotal: 10, daysLeft: 10, type: '2bac' },
+                { name: 'اطلاع وتجهيز: الإنجليزية 2bac', daysTotal: 10, daysLeft: 10, type: '2bac' },
+                { name: 'اطلاع وتجهيز: الفلسفة 2bac', daysTotal: 15, daysLeft: 15, type: '2bac' }
             ],
             history: [],
             currentNotes: ""
         };
 
         const ranks = ["Script Kiddie", "Junior Hacker", "Bug Hunter", "Pentester", "Red Teamer", "Cyber Ninja", "System Architect"];
-        const quotes = [
-            "لا يوجد نظام آمن بنسبة 100%، نقطة الضعف دائمًا هي الإنسان.",
-            "الذكاء الاصطناعي لن يسرق وظيفتك، بل من يستخدم الذكاء الاصطناعي هو من سيفعل.",
-            "الانضباط هو الجسر بين أهدافك وإنجازاتها.",
-            "في الأمن السيبراني: فكر كمهاجم، واعمل كمدافع."
-        ];
+        let myChart = null;
 
-        /* =========================================
-           2. التهيئة وإدارة التخزين (Init & Storage)
-           ========================================= */
-        window.onload = () => {
-            const savedData = localStorage.getItem('cyberCampData_v2');
-            if (savedData) { db = JSON.parse(savedData); }
-            
-            document.getElementById('daily-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        // تهيئة النظام وإدخال رمز الأمان
+        function unlockSystem() {
+            const pin = document.getElementById('pin-input').value;
+            if (pin === '1234' || pin === '') { 
+                document.getElementById('lock-screen').style.display = 'none';
+                initDashboard();
+            } else {
+                alert('رمز PIN خاطئ! الحماية مفعلة.');
+            }
+        }
+
+        function initDashboard() {
+            const localData = localStorage.getItem('cyberCampData_v3.0');
+            if (localData) {
+                db = JSON.parse(localData);
+            }
+            applyTheme(db.stats.currentTheme || 'default');
             renderAll();
-        };
+            writeTerminal('System loaded. Terminal online. Press [Esc] to quick focus command prompt.');
+        }
 
         function saveData() {
-            localStorage.setItem('cyberCampData_v2', JSON.stringify(db));
+            localStorage.setItem('cyberCampData_v3.0', JSON.stringify(db));
             renderAll();
         }
+
         function resetXP() {
-            if(confirm("هل أنت متأكد أنك تريد تصفير نقاط الـ XP والمستوى والبدء من الصفر؟")) {
+            if(confirm("هل تريد تصفير نقاط الـ XP والمستوى والبدء من الصفر؟")) {
                 db.stats.xp = 0;
                 db.stats.level = 1;
                 saveData();
-                alert("تم تصفير عداد الـ XP بنجاح! ⚡");
-    }
-}
+            }
+        }
 
-        /* =========================================
-           3. التصدير والاستيراد (Export / Import JSON)
-           ========================================= */
+        // الاختصارات السريعة لـ لوحة المفاتيح (ميزة 7)
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') {
+                e.preventDefault();
+                document.getElementById('term-cmd').focus();
+            }
+        });
+
+        // تشغيل نظام الأنماط والألوان (ميزة 10)
+        function toggleTheme切换() {
+            let current = db.stats.currentTheme || 'default';
+            let next = 'default';
+            if (current === 'default') next = 'matrix';
+            else if (current === 'matrix') next = 'redteam';
+            applyTheme(next);
+            saveData();
+        }
+
+        function applyTheme(theme) {
+            db.stats.currentTheme = theme;
+            document.body.className = '';
+            if (theme === 'matrix') document.body.classList.add('matrix-theme');
+            if (theme === 'redteam') document.body.classList.add('redteam-theme');
+        }
+
+        // محرك الطرفية ومعالجة الأوامر البرمجية (ميزة 1)
+        const termInput = document.getElementById('term-cmd');
+        termInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                let rawCmd = this.value.trim();
+                if (!rawCmd) return;
+                writeTerminal(`<span style="color:#fff;">$ ${rawCmd}</span>`);
+                executeTerminalCommand(rawCmd);
+                this.value = '';
+                db.stats.terminalCmdsExecuted = (db.stats.terminalCmdsExecuted || 0) + 1;
+                checkBadgesLogic();
+            }
+        });
+
+        function writeTerminal(text) {
+            const out = document.getElementById('term-out');
+            out.innerHTML += `<div>${text}</div>`;
+            out.scrollTop = out.scrollHeight;
+        }
+
+        function executeTerminalCommand(input) {
+            let tokens = input.split(' ');
+            let command = tokens[0].toLowerCase();
+            
+            if (command === 'help') {
+                writeTerminal('Commands: help, clear, cls, timer [min], add "[task]"');
+            } else if (command === 'clear' || command === 'cls') {
+                document.getElementById('term-out').innerHTML = '';
+            } else if (command === 'timer') {
+                let min = parseInt(tokens[1]);
+                if (min > 0) { setTimer(min); writeTerminal(`Timer set to ${min} minutes.`); }
+                else { writeTerminal('Error: Invalid duration.'); }
+            } else if (command === 'add') {
+                let match = input.match(/"([^"]+)"/);
+                if (match && match[1]) {
+                    db.tasks.push({ id: Date.now(), text: match[1], done: false, isStatic: false });
+                    writeTerminal(`Task added: "${match[1]}"`);
+                    saveData();
+                } else {
+                    writeTerminal('Error: Use syntax -> add "task text"');
+                }
+            } else {
+                writeTerminal(`Unknown command: "${command}". Type "help" for a list of directives.`);
+            }
+        }
+
+        // الأدوات المصغرة (ميزة 8)
+        function runCrypto(type) {
+            const inp = document.getElementById('crypto-input').value;
+            const out = document.getElementById('crypto-output');
+            try {
+                if (type === 'encode') {
+                    out.innerText = btoa(unescape(encodeURIComponent(inp)));
+                } else {
+                    out.innerText = decodeURIComponent(escape(atob(inp)));
+                }
+            } catch(e) {
+                out.innerText = "🚨 خطأ: مدخلات غير صالحة لعملية التحويل الباينري للبيانات.";
+            }
+        }
+
+        // عرض مكونات لوحة التحكم بالكامل
+        function renderAll() {
+            let left = db.stats.totalDays - db.stats.daysDone;
+            document.getElementById('ui-days-left').innerText = left;
+            document.getElementById('ui-days-done').innerText = db.stats.daysDone;
+            document.getElementById('xp-current').innerText = db.stats.xp;
+            document.getElementById('level-num').innerText = db.stats.level;
+            
+            let rankIndex = Math.min(db.stats.level - 1, ranks.length - 1);
+            document.getElementById('rank-title').innerText = ranks[rankIndex];
+            document.getElementById('xp-bar-fill').style.width = (db.stats.xp % 100) + "%";
+
+            let ratio = (db.stats.daysDone / db.stats.totalDays) * 100;
+            document.getElementById('progress-circle').setAttribute('stroke-dasharray', `${ratio}, 100`);
+            document.getElementById('days-ratio').innerText = `${db.stats.daysDone}/${db.stats.totalDays}`;
+
+            document.getElementById('daily-notes').value = db.currentNotes || "";
+
+            renderTasks();
+            renderSprints();
+            renderBooks();
+            renderHistory();
+            checkBadgesLogic();
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+            db.tasks.forEach((t, i) => {
+                container.innerHTML += `
+                    <div class="task-item ${t.isStatic ? '' : 'custom'}">
+                        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${i}, this.checked)">
+                        <span style="flex-grow: 1; ${t.done ? 'text-decoration:line-through; color:var(--text-dim)' : ''}">${t.text}</span>
+                        ${!t.isStatic ? `<button onclick="deleteTask(${i})" style="border:none; color:var(--neon-red); padding:2px;">❌</button>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function toggleTask(index, isDone) {
+            db.tasks[index].done = isDone;
+            if (isDone) db.stats.xp += 10;
+            saveData();
+        }
+
+        function addCustomTask() {
+            const inp = document.getElementById('new-task-input');
+            if(inp.value.trim()) {
+                db.tasks.push({ id: Date.now(), text: inp.value.trim(), done: false, isStatic: false });
+                inp.value = '';
+                saveData();
+            }
+        }
+
+        function deleteTask(index) { db.tasks.splice(index, 1); saveData(); }
+
+        function renderSprints() {
+            const container = document.getElementById('sprints-container');
+            container.innerHTML = '';
+            db.sprints.forEach((s, i) => {
+                let isFinished = s.daysLeft <= 0;
+                container.innerHTML += `
+                    <div class="sprint-item" style="border-right-color: ${s.type === '1bac' ? 'var(--neon-cyan)' : 'var(--neon-orange)'}; opacity: ${isFinished ? '0.4' : '1'}">
+                        <div style="display:flex; justify-content:between; align-items:center;">
+                            <span style="font-weight:bold; flex-grow:1; ${isFinished ? 'text-decoration:line-through;' : ''}">${s.name}</span>
+                            <span style="font-size:0.75rem; border:1px solid currentColor; padding:1px 4px; border-radius:3px;">${s.type}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:5px; align-items:center;">
+                            <span>باقي: <strong>${s.daysLeft}</strong> / ${s.daysTotal} يوم</span>
+                            ${!isFinished ? `<button onclick="advanceSprint(${i})" style="padding:2px 6px; font-size:0.75rem; color:var(--neon-green); border-color:var(--neon-green)">إنجاز يوم +1</button>` : '<span>مكتمل ✓</span>'}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function advanceSprint(i) {
+            if(db.sprints[i].daysLeft > 0) {
+                db.sprints[i].daysLeft--;
+                db.stats.xp += 20;
+                saveData();
+            }
+        }
+
+        function renderBooks() {
+            const container = document.getElementById('books-container');
+            container.innerHTML = '';
+            db.books.forEach((b, i) => {
+                let pct = Math.round((b.read / b.total) * 100) || 0;
+                container.innerHTML += `
+                    <div style="background:rgba(0,0,0,0.3); border:1px solid #222; padding:8px; border-radius:6px; margin-bottom:5px; font-size:0.85rem;">
+                        <div style="display:flex; justify-content:space-between;"><strong>${b.name}</strong><span>${pct}%</span></div>
+                        <div style="display:flex; gap:5px; margin-top:5px;">
+                            <input type="number" id="bk-v-${i}" value="${b.read}" max="${b.total}" style="width:70px; margin:0; padding:2px; text-align:center;">
+                            <button onclick="updateBook(${i})" style="padding:2px 6px; font-size:0.75rem;">تحديث</button>
+                            <button onclick="deleteBook(${i})" style="border-color:var(--neon-red); color:var(--neon-red); padding:2px 4px;">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addBook() {
+            let n = document.getElementById('book-name').value.trim();
+            let p = parseInt(document.getElementById('book-pages').value);
+            if(n && p > 0) { db.books.push({ name: n, total: p, read: 0 }); saveData(); }
+        }
+        function updateBook(i) {
+            let val = parseInt(document.getElementById(`bk-v-${i}`).value);
+            if(val >= 0 && val <= db.books[i].total) { db.books[i].read = val; saveData(); }
+        }
+        function deleteBook(i) { db.books.splice(i,1); saveData(); }
+
+        function saveNotes() {
+            db.currentNotes = document.getElementById('daily-notes').value;
+            localStorage.setItem('cyberCampData_v3.0', JSON.stringify(db));
+            alert("تم تشفير وحفظ الملاحظات بنجاح 🔒");
+        }
+
+        // نظام التحقق وتفعيل الأوسمة والإنجازات الذكية (ميزة 4)
+        function checkBadgesLogic() {
+            if(db.stats.daysDone >= 1) document.getElementById('badge-1').classList.add('unlocked');
+            if(db.stats.level >= 3) document.getElementById('badge-2').classList.add('unlocked');
+            
+            let completedBook = db.books.some(b => b.read >= b.total && b.total > 0);
+            if(completedBook) document.getElementById('badge-3').classList.add('unlocked');
+            
+            let bDays = db.sprints.reduce((acc, curr) => acc + (curr.daysTotal - curr.daysLeft), 0);
+            if(bDays >= 5) document.getElementById('badge-4').classList.add('unlocked');
+            if((db.stats.terminalCmdsExecuted || 0) >= 5) document.getElementById('badge-5').classList.add('unlocked');
+            if(db.stats.daysDone >= 30) document.getElementById('badge-6').classList.add('unlocked');
+        }
+
+// متغيرات عالمية لحفظ المبيانات ومنع تداخلها عند التحديث
+        let timeChartInstance = null;
+        let sprintsChartInstance = null;
+
+        function renderCharts() {
+            // --- 1. المبيان الأول: منحنى الزمن والـ XP ---
+            const ctxTime = document.getElementById('timeChart').getContext('2d');
+            if(timeChartInstance) timeChartInstance.destroy();
+
+            let timeLabels = ['البداية'];
+            let xpData = [0];
+            let daysData = [0];
+
+            // ترتيب سجل الأيام تصاعدياً لبناء المنحنى الزمني
+            let historyCopy = [...db.history].reverse();
+            historyCopy.forEach((record) => {
+                timeLabels.push(`اليوم ${record.dayNum}`);
+                xpData.push(record.dayNum * 50); // مكافأة أرشفة اليوم الثابتة
+                daysData.push(record.dayNum);
+            });
+
+            // تأمين ظهور بيانات اليوم الحالي إذا كان السجل فارغاً
+            if(db.history.length === 0 && db.stats.daysDone > 0) {
+                timeLabels.push(`اليوم ${db.stats.daysDone}`);
+                xpData.push(db.stats.xp);
+                daysData.push(db.stats.daysDone);
+            }
+
+            timeChartInstance = new Chart(ctxTime, {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [
+                        {
+                            label: 'نقاط الخبرة التراكمية (XP)',
+                            data: xpData,
+                            borderColor: '#00f3ff',
+                            backgroundColor: 'rgba(0, 243, 255, 0.05)',
+                            yAxisID: 'y-xp',
+                            tension: 0.2,
+                            fill: true
+                        },
+                        {
+                            label: 'الأيام المنقضية',
+                            data: daysData,
+                            borderColor: '#bc13fe',
+                            backgroundColor: 'transparent',
+                            yAxisID: 'y-days',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        'y-xp': { type: 'linear', position: 'left', title: { display: true, text: 'الـ XP', color: '#00f3ff' } },
+                        'y-days': { type: 'linear', position: 'right', title: { display: true, text: 'الأيام المكتملة', color: '#bc13fe' }, grid: { drawOnChartArea: false } }
+                    },
+                    plugins: { legend: { labels: { color: '#fff', font: { family: 'Cairo', size: 11 } } } }
+                }
+            });
+
+            // --- 2. المبيان الثاني: إحصائيات الدروس والمواد بشكل منفصل ---
+            const ctxSprints = document.getElementById('sprintsChart').getContext('2d');
+            if(sprintsChartInstance) sprintsChartInstance.destroy();
+
+            // استخراج الأيام التي درستها بالفعل في كل مادة
+            let sprintLabels = db.sprints.map(s => s.name);
+            let completedDaysData = db.sprints.map(s => s.daysTotal - s.daysLeft);
+            let totalDaysData = db.sprints.map(s => s.daysTotal);
+
+            sprintsChartInstance = new Chart(ctxSprints, {
+                type: 'bar',
+                data: {
+                    labels: sprintLabels,
+                    datasets: [
+                        {
+                            label: 'الأيام المنجزة بنجاح ✓',
+                            data: completedDaysData,
+                            backgroundColor: '#00ff66',
+                            borderWidth: 0
+                        },
+                        {
+                            label: 'المدة الإجمالية المطلوبة للمادة ⏱️',
+                            data: totalDaysData,
+                            backgroundColor: 'rgba(255, 153, 0, 0.2)',
+                            borderColor: '#ff9900',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y', // تحويل الأعمدة لتصبح أفقية مريحة للعين وقابلة للقراءة
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, title: { display: true, text: 'عدد الأيام المخصصة المنقضية', color: '#fff' } },
+                        y: { ticks: { color: '#fff', font: { family: 'Cairo', size: 10 } } }
+                    },
+                    plugins: { legend: { labels: { color: '#fff', font: { family: 'Cairo', size: 11 } } } }
+                }
+            });
+        }
+
+        // أرشفة الأيام وقفل الدورة الزمنية
+        function finishDay() {
+            if(db.stats.daysDone >= db.stats.totalDays) return;
+            if(!confirm("هل تريد إقفال اليوم الحالي وأرشفة جميع السجلات؟")) return;
+
+            db.currentNotes = document.getElementById('daily-notes').value;
+            let record = {
+                dayNum: db.stats.daysDone + 1,
+                date: new Date().toLocaleDateString('ar-EG'),
+                notes: db.currentNotes,
+                tasksLog: db.tasks.map(t => ({ text: t.text, status: t.done ? '✓' : '✗' }))
+            };
+
+            db.history.unshift(record);
+            db.stats.daysDone++;
+            db.stats.xp += 50;
+            db.stats.level = Math.floor(db.stats.xp / 100) + 1;
+            
+            db.currentNotes = "";
+            db.tasks.forEach(t => { if(!t.isStatic) t.done = false; else t.done = false; });
+            
+            saveData();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '';
+            if(db.history.length === 0) { container.innerHTML = '<p style="color:var(--text-dim); text-align:center;">لا توجد أيام مؤرشفة بعد.</p>'; return; }
+            db.history.forEach((h, i) => {
+                container.innerHTML += `
+                    <div style="background:rgba(0,0,0,0.4); border-right:3px solid var(--neon-green); padding:10px; margin-bottom:8px; border-radius:6px;">
+                        <div style="display:flex; justify-content:space-between; color:var(--neon-green); font-size:0.85rem; font-weight:bold; margin-bottom:5px;">
+                            <span>اليوم المكتمل ${h.dayNum} - (${h.date})</span>
+                            <button onclick="deleteHistory(${i})" style="border-color:var(--neon-red); color:var(--neon-red); padding:0 4px; font-size:0.75rem;">حذف</button>
+                        </div>
+                        <div style="font-size:0.85rem; white-space:pre-wrap; background:rgba(0,0,0,0.3); padding:5px; border-radius:4px;">${h.notes || 'بدون ملاحظات مسجلة.'}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteHistory(i) {
+            if(confirm("حذف هذا اليوم سيخفض نقاط الـ XP، متأكد؟")) {
+                db.stats.daysDone--;
+                db.stats.xp = Math.max(0, db.stats.xp - 50);
+                db.history.splice(i, 1);
+                saveData();
+            }
+        }
+
+        // النوافذ المنبثقة والتحكم بها
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModalOnOuter(e) { if(e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; }
+
+        // تصدير واستيراد البيانات الاحتياطية
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `CyberCamp_Backup_Day${db.stats.daysDone}.json`);
-            dlAnchorElem.click();
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `CyberCamp_Backup_v3.json`);
+            a.click();
         }
 
         function importData(event) {
@@ -294,285 +754,33 @@
                 try {
                     db = JSON.parse(e.target.result);
                     saveData();
-                    alert("تم استعادة النظام بنجاح! 🟢");
-                } catch (err) { alert("ملف غير صالح! 🔴"); }
+                    alert("تمت استعادة البيانات الإحصائية والملفات بنجاح 🟢");
+                } catch (err) { alert("الملف المرفوع غير مدعوم أو تالف 🔴"); }
             };
             reader.readAsText(file);
         }
 
-        /* =========================================
-           4. نظام التلعيب والخبرة (Gamification)
-           ========================================= */
-        function addXP(amount) {
-            db.stats.xp += amount;
-            db.stats.level = Math.floor(db.stats.xp / 100) + 1;
-            saveData();
-        }
+        // عداد الوقت بومودورو
+        let tInterval;
+        let tLeft = 50 * 60;
+        let tActive = false;
 
-        /* =========================================
-           5. عرض واجهة المستخدم (Rendering Engine)
-           ========================================= */
-        function renderAll() {
-            // Stats & Level
-            let left = db.stats.totalDays - db.stats.daysDone;
-            document.getElementById('ui-days-left').innerText = left;
-            document.getElementById('ui-days-done').innerText = db.stats.daysDone;
-            
-            document.getElementById('xp-current').innerText = db.stats.xp;
-            document.getElementById('level-num').innerText = db.stats.level;
-            
-            let rankIndex = Math.min(db.stats.level - 1, ranks.length - 1);
-            document.getElementById('rank-title').innerText = ranks[rankIndex];
-            
-            let xpPercent = (db.stats.xp % 100) + "%";
-            document.getElementById('xp-bar-fill').style.width = xpPercent;
-
-            // Progress Ring
-            let ratio = (db.stats.daysDone / db.stats.totalDays) * 100;
-            document.getElementById('progress-circle').setAttribute('stroke-dasharray', `${ratio}, 100`);
-            document.getElementById('days-ratio').innerText = `${db.stats.daysDone}/${db.stats.totalDays}`;
-
-            // Notes
-            document.getElementById('daily-notes').value = db.currentNotes;
-
-            renderTasks();
-            renderBooks();
-            renderLinks();
-            renderHistory();
-        }
-
-        /* =========================================
-           6. إدارة المهام (Tasks)
-           ========================================= */
-        function renderTasks() {
-            const container = document.getElementById('tasks-container');
-            container.innerHTML = '';
-            db.tasks.forEach((t, i) => {
-                container.innerHTML += `
-                    <div class="task-item ${t.isStatic ? '' : 'custom'}">
-                        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${i}, this.checked)">
-                        <span style="flex-grow: 1; margin-right: 10px; ${t.done ? 'text-decoration:line-through; color:var(--text-dim)' : ''}">${t.text}</span>
-                        ${!t.isStatic ? `<button onclick="deleteTask(${i})" style="background:transparent; border:none; color:var(--neon-red); cursor:pointer;">❌</button>` : ''}
-                    </div>
-                `;
-            });
-        }
-
-        function toggleTask(index, isDone) {
-            db.tasks[index].done = isDone;
-            if (isDone) addXP(10); // 10 XP لكل مهمة منجزة
-            saveData();
-        }
-
-        function addCustomTask() {
-            const val = document.getElementById('new-task-input').value.trim();
-            if(val) {
-                db.tasks.push({ id: Date.now(), text: val, done: false, isStatic: false });
-                document.getElementById('new-task-input').value = '';
-                saveData();
-            }
-        }
-
-        function deleteTask(index) {
-            db.tasks.splice(index, 1);
-            saveData();
-        }
-
-        /* =========================================
-           7. إدارة الكتب (Books)
-           ========================================= */
-        function renderBooks() {
-            const container = document.getElementById('books-container');
-            container.innerHTML = '';
-            db.books.forEach((b, i) => {
-                let percent = Math.round((b.read / b.total) * 100);
-                container.innerHTML += `
-                    <div class="book-item">
-                        <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:5px;">
-                            <strong style="color:var(--neon-cyan)">${b.name}</strong>
-                            <span>${b.read} / ${b.total} (${percent}%)</span>
-                        </div>
-                        <progress value="${b.read}" max="${b.total}"></progress>
-                        <div style="display:flex; gap:5px; margin-top:8px;">
-                            <input type="number" id="bk-val-${i}" value="${b.read}" min="0" max="${b.total}" style="margin:0; padding:3px; text-align:center;">
-                            <button onclick="updateBook(${i})" style="background:#222; color:#fff; border:1px solid #444; border-radius:4px; padding:0 10px; cursor:pointer;">تحديث</button>
-                            <button onclick="deleteBook(${i})" style="background:transparent; color:var(--neon-red); border:none; cursor:pointer;">حذف</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function addBook() {
-            let name = document.getElementById('book-name').value.trim();
-            let pages = parseInt(document.getElementById('book-pages').value);
-            if(name && pages > 0) {
-                db.books.push({ name: name, total: pages, read: 0 });
-                document.getElementById('book-name').value = '';
-                document.getElementById('book-pages').value = '';
-                saveData();
-            }
-        }
-
-        function updateBook(index) {
-            let newVal = parseInt(document.getElementById(`bk-val-${index}`).value);
-            if(newVal >= 0 && newVal <= db.books[index].total) {
-                let diff = newVal - db.books[index].read;
-                if(diff > 0) addXP(diff); // 1 XP لكل صفحة مقروءة
-                db.books[index].read = newVal;
-                saveData();
-            }
-        }
-
-        function deleteBook(index) {
-            db.books.splice(index, 1);
-            saveData();
-        }
-
-        /* =========================================
-           8. الروابط السريعة (Links)
-           ========================================= */
-        function renderLinks() {
-            const container = document.getElementById('links-container');
-            container.innerHTML = '';
-            db.links.forEach((l, i) => {
-                container.innerHTML += `
-                    <div class="link-item">
-                        <a href="${l.url}" target="_blank">🔗 ${l.name}</a>
-                        <button onclick="deleteLink(${i})" style="background:transparent; border:none; color:var(--text-dim); cursor:pointer;">✖</button>
-                    </div>
-                `;
-            });
-        }
-
-        function addLink() {
-            let name = document.getElementById('link-name').value.trim();
-            let url = document.getElementById('link-url').value.trim();
-            if(name && url) {
-                if(!url.startsWith('http')) url = 'https://' + url;
-                db.links.push({ name: name, url: url });
-                document.getElementById('link-name').value = '';
-                document.getElementById('link-url').value = '';
-                saveData();
-            }
-        }
-        function deleteLink(index) { db.links.splice(index, 1); saveData(); }
-
-        /* =========================================
-           9. الأرشفة وانقضاء اليوم (History System)
-           ========================================= */
-        function saveNotes() {
-            db.currentNotes = document.getElementById('daily-notes').value;
-            saveData();
-            alert("تم الحفظ 🔒");
-        }
-
-        function finishDay() {
-            if(db.stats.daysDone >= db.stats.totalDays) {
-                alert("لقد أتممت العطلة بالكامل! 🏆"); return;
-            }
-            if(!confirm("هل أنت متأكد من إنهاء اليوم وأرشفته؟")) return;
-
-            // جمع بيانات اليوم
-            saveNotes();
-            let dayRecord = {
-                dayNum: db.stats.daysDone + 1,
-                date: new Date().toLocaleDateString('ar-EG'),
-                notes: db.currentNotes,
-                tasksLog: db.tasks.map(t => ({ text: t.text, status: t.done ? '✓' : '✗' }))
-            };
-
-            // تحديث الإحصائيات
-            db.history.unshift(dayRecord);
-            db.stats.daysDone++;
-            addXP(50); // مكافأة إنهاء اليوم
-            
-            // تصفير يوم غد
-            db.currentNotes = "";
-            db.tasks.forEach(t => t.done = false);
-
-            saveData();
-            alert(`تم تهيئة النظام لليوم ${db.stats.daysDone + 1} 🚀`);
-        }
-
-        function renderHistory() {
-            const container = document.getElementById('history-container');
-            container.innerHTML = '';
-            if(db.history.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-dim); text-align:center;">سجل النظام فارغ.</p>';
-                return;
-            }
-
-            db.history.forEach((h, i) => {
-                let tasksHTML = '<ul style="margin-right:20px; font-size:0.9rem; color:var(--text-dim); margin-bottom:10px;">';
-                h.tasksLog.forEach(t => {
-                    let color = t.status === '✓' ? 'var(--neon-green)' : 'var(--neon-red)';
-                    tasksHTML += `<li>${t.text}: <span style="color:${color}">${t.status}</span></li>`;
-                });
-                tasksHTML += '</ul>';
-
-                container.innerHTML += `
-                    <div class="history-log">
-                        <div class="history-header">
-                            <span>اليوم ${h.dayNum} - [${h.date}]</span>
-                            <button class="btn-delete-history" onclick="deleteHistory(${i})">حذف السجل 🗑️</button>
-                        </div>
-                        ${tasksHTML}
-                        <div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:5px; white-space:pre-wrap; border:1px solid #333; font-size:0.9rem;">${h.notes || "لا توجد ملاحظات مسجلة."}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function deleteHistory(index) {
-            if(!confirm("حذف هذا اليوم سيعيده للوراء وينقص الـ XP. متأكد؟")) return;
-            
-            db.stats.daysDone--;
-            db.stats.xp = Math.max(0, db.stats.xp - 50); // خصم نقاط اليوم المحذوف
-            db.history.splice(index, 1);
-            saveData();
-        }
-
-        /* =========================================
-           10. مؤقت التركيز (Pomodoro) وملء الشاشة
-           ========================================= */
-        let timerInterval;
-        let timeRemaining = 50 * 60; // ثواني
-        let isRunning = false;
-
-        function setTimer(minutes, btn) {
-            clearInterval(timerInterval);
-            timeRemaining = minutes * 60;
-            isRunning = false;
-            document.getElementById('timer-toggle').innerText = "▶ بدء";
-            updateTimerDisplay();
-        }
-
+        function setTimer(m) { clearInterval(tInterval); tLeft = m * 60; tActive = false; document.getElementById('timer-toggle').innerText = "▶ بدء"; updateTDisplay(); }
         function toggleTimer() {
             const btn = document.getElementById('timer-toggle');
-            if(isRunning) {
-                clearInterval(timerInterval);
-                btn.innerText = "▶ استئناف";
-                isRunning = false;
-            } else {
-                timerInterval = setInterval(() => {
-                    if(timeRemaining > 0) { timeRemaining--; updateTimerDisplay(); }
-                    else { clearInterval(timerInterval); alert("انتهى الوقت! 🔔"); isRunning = false; }
+            if(tActive) { clearInterval(tInterval); btn.innerText = "▶ استئناف"; tActive = false; }
+            else {
+                tInterval = setInterval(() => {
+                    if(tLeft > 0) { tLeft--; updateTDisplay(); }
+                    else { clearInterval(tInterval); alert("انتهى وقت الجلسة الحالية! 🔔"); tActive = false; }
                 }, 1000);
-                btn.innerText = "⏸ إيقاف";
-                isRunning = true;
+                btn.innerText = "⏸ إيقاف"; tActive = true;
             }
         }
-
-        function updateTimerDisplay() {
-            let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-            let s = (timeRemaining % 60).toString().padStart(2, '0');
+        function updateTDisplay() {
+            let m = Math.floor(tLeft / 60).toString().padStart(2, '0');
+            let s = (tLeft % 60).toString().padStart(2, '0');
             document.getElementById('timer').innerText = `${m}:${s}`;
-        }
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
-            else { if (document.exitFullscreen) { document.exitFullscreen(); } }
         }
     </script>
 </body>
