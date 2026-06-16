@@ -682,42 +682,93 @@
             });
         }
 
-        // أرشفة الأيام وقفل الدورة الزمنية
+// أرشفة الأيام وقفل الدورة الزمنية بالتفاصيل الكاملة
         function finishDay() {
-            if(db.stats.daysDone >= db.stats.totalDays) return;
-            if(!confirm("هل تريد إقفال اليوم الحالي وأرشفة جميع السجلات؟")) return;
+            if(db.stats.daysDone >= db.stats.totalDays) {
+                alert("لقد أتممت المعسكر الصيفي بالكامل! 🏆");
+                return;
+            }
+            if(!confirm("هل تريد إقفال اليوم الحالي وأرشفة جميع المهام والملاحظات نظامياً؟")) return;
 
+            // التقاط الملاحظات الحالية من الواجهة
             db.currentNotes = document.getElementById('daily-notes').value;
+
+            // بناء سجل تفصيلي دقيق لمهام اليوم
+            let tasksSnapshot = db.tasks.map(t => {
+                return {
+                    text: t.text,
+                    done: t.done
+                };
+            });
+
+            // إنشاء كائن السجل المكتمل
             let record = {
                 dayNum: db.stats.daysDone + 1,
                 date: new Date().toLocaleDateString('ar-EG'),
-                notes: db.currentNotes,
-                tasksLog: db.tasks.map(t => ({ text: t.text, status: t.done ? '✓' : '✗' }))
+                notes: db.currentNotes.trim(),
+                tasksLog: tasksSnapshot
             };
 
+            // إضافة السجل في مقدمة المصفوفة ليعرض الأحدث أولاً
             db.history.unshift(record);
+            
+            // تحديث العدادات ونقاط الـ XP والمستوى
             db.stats.daysDone++;
             db.stats.xp += 50;
             db.stats.level = Math.floor(db.stats.xp / 100) + 1;
             
+            // إعادة ضبط وتصفير الواجهة لليوم الجديد
             db.currentNotes = "";
-            db.tasks.forEach(t => { if(!t.isStatic) t.done = false; else t.done = false; });
+            document.getElementById('daily-notes').value = "";
+            db.tasks.forEach(t => t.done = false); // تصفير حالة تشيك بوكس المهام الثابتة
             
+            // إزالة المهام المخصصة المؤقتة والإبقاء على الـ 5 مهام السيبرانية الأساسية فقط
+            db.tasks = db.tasks.filter(t => t.isStatic);
+
             saveData();
+            writeTerminal(`[SYSTEM] Day ${record.dayNum} archived successfully. +50 XP Granted.`);
         }
 
+        // رصد وعرض سجل الأيام المؤرشفة والمقيدة نظامياً مع فحص المهام
         function renderHistory() {
             const container = document.getElementById('history-container');
             container.innerHTML = '';
-            if(db.history.length === 0) { container.innerHTML = '<p style="color:var(--text-dim); text-align:center;">لا توجد أيام مؤرشفة بعد.</p>'; return; }
+            
+            if(!db.history || db.history.length === 0) { 
+                container.innerHTML = '<p style="color:var(--text-dim); text-align:center; padding: 20px;">لا توجد أيام مؤرشفة في قاعدة البيانات حالياً.</p>'; 
+                return; 
+            }
+            
             db.history.forEach((h, i) => {
+                // بناء قائمة المهام المؤرشفة لهذا اليوم المحدد
+                let tasksListHTML = '';
+                if(h.tasksLog && h.tasksLog.length > 0) {
+                    tasksListHTML = '<ul style="list-style: none; padding-right: 15px; margin-bottom: 10px; font-size: 0.85rem;">';
+                    h.tasksLog.forEach(task => {
+                        if(task.done) {
+                            tasksListHTML += `<li style="color: #00ff66; margin-bottom: 3px;">✓ ${task.text}</li>`;
+                        } else {
+                            tasksListHTML += `<li style="color: var(--neon-red); margin-bottom: 3px;">✗ ${task.text}</li>`;
+                        }
+                    });
+                    tasksListHTML += '</ul>';
+                } else {
+                    tasksListHTML = '<p style="color: var(--text-dim); font-size: 0.8rem; padding-right:15px;">لم يتم تسجيل مهام لهذا اليوم.</p>';
+                }
+
+                // عرض حاوية السجل الكلية
                 container.innerHTML += `
-                    <div style="background:rgba(0,0,0,0.4); border-right:3px solid var(--neon-green); padding:10px; margin-bottom:8px; border-radius:6px;">
-                        <div style="display:flex; justify-content:space-between; color:var(--neon-green); font-size:0.85rem; font-weight:bold; margin-bottom:5px;">
-                            <span>اليوم المكتمل ${h.dayNum} - (${h.date})</span>
-                            <button onclick="deleteHistory(${i})" style="border-color:var(--neon-red); color:var(--neon-red); padding:0 4px; font-size:0.75rem;">حذف</button>
+                    <div style="background: rgba(10, 15, 30, 0.6); border: 1px solid #222; border-right: 4px solid var(--neon-green); padding: 15px; margin-bottom: 12px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; margin-bottom: 10px;">
+                            <span style="color: var(--neon-green); font-weight: bold; font-size: 0.95rem;">اليوم المكتمل ${h.dayNum} <span style="color: var(--text-dim); font-size: 0.8rem; font-weight: normal;">[${h.date}]</span></span>
+                            <button onclick="deleteHistory(${i})" style="border-color: var(--neon-red); color: var(--neon-red); padding: 2px 8px; font-size: 0.75rem; background: transparent; border-radius: 4px;">حذف السجل</button>
                         </div>
-                        <div style="font-size:0.85rem; white-space:pre-wrap; background:rgba(0,0,0,0.3); padding:5px; border-radius:4px;">${h.notes || 'بدون ملاحظات مسجلة.'}</div>
+                        
+                        ${tasksListHTML}
+                        
+                        <div style="font-size: 0.85rem; color: #e2e8f0; white-space: pre-wrap; background: rgba(0, 0, 0, 0.5); padding: 8px 12px; border-radius: 6px; border: 1px solid #111; font-family: inherit;">
+                            ${h.notes ? h.notes : '<span style="color: var(--text-dim); italic">لا توجد ملاحظات مسجلة لهذا اليوم.</span>'}
+                        </div>
                     </div>
                 `;
             });
